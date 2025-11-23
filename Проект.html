@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PriceCompare - Сравнение цен на маркетплейсах</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Титульный лист с улучшенной анимацией */
+        .title-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .title-page h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .title-page h2 {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 500;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            max-width: 800px;
+        }
+        
+        .title-page .subtitle {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            margin-bottom: 50px;
+            max-width: 900px;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+        
+        .title-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+            width: 100%;
+            max-width: 1200px;
+            justify-items: center;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.15);
+            padding: 30px;
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        .feature-card p {
+            font-size: 1.05rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .start-button {
+            background: white;
+            color: #6366f1;
+            border: none;
+            border-radius: 50px;
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .start-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .start-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        
+        .start-button:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+        
+        /* Основной контент с улучшенным фоном */
+        .main-content {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .main-content.active {
+            display: block;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border-color: #6366f1;
+        }
+        
+        .marketplace-logo {
+            height: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .product-image {
+            width: 100%;
+            max-width: 220px;
+            height: auto;
+            margin: 0 auto 25px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            object-fit: contain;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.08);
+        }
+        
+        .product-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #6366f1;
+            line-height: 1.3;
+        }
+        
+        .product-specs {
+            color: #64748b;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            flex-grow: 1;
+            line-height: 1.6;
+        }
+        
+        .price-container {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+            display: block;
+            letter-spacing: -0.02em;
+        }
+        
+        .buy-button {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 28px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .buy-button::after {
+            content: '→';
+            position: absolute;
+            right: 20px;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .buy-button:hover::after {
+            opacity: 1;
+            right: 15px;
+        }
+        
+        .buy-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .buy-button:active {
+            transform: translateY(-1px);
+        }
+        
+        .availability {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #10b981;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .availability::before {
+            content: '✓';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            line-height: 18px;
+        }
+        
+        .rating {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: #64748b;
+            background: #fef3c7;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .specs-section, .processor-section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .specs-section:hover, .processor-section:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        .specs-section h2, .processor-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #6366f1;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .specs-section h2::after, .processor-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 2px;
+        }
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+            box-shadow: 0 0 0 1px #e2e8f0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        
+        th, td {
+            padding: 18px 24px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            font-weight: 700;
+            color: #6366f1;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        td {
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background-color: #fafafa;
+        }
+        
+        .processor-info {
+            color: #64748b;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-button {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            color: #64748b;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        .nav-button.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .nav-button:hover:not(.active) {
+            border-color: #6366f1;
+            color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .product-details .product-card {
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .delivery-info {
+            margin-top: 30px;
+            text-align: left;
+            padding-top: 25px;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .delivery-info h4 {
+            margin-bottom: 18px;
+            color: #6366f1;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .delivery-info p {
+            margin-bottom: 10px;
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding-left: 8px;
+        }
+        
+        /* Адаптивный дизайн */
+        @media (max-width: 1200px) {
+            .title-features {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .title-page {
+                padding: 40px 20px;
+            }
+            
+            .title-features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            
+            .navigation {
+                gap: 10px;
+            }
+            
+            .nav-button {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+                flex: 1;
+                min-width: 140px;
+            }
+            
+            header {
+                padding: 30px 20px;
+                margin-bottom: 30px;
+            }
+            
+            .specs-section, .processor-section {
+                padding: 25px 20px;
+                margin-bottom: 30px;
+            }
+            
+            .product-card {
+                padding: 25px 20px;
+            }
+            
+            th, td {
+                padding: 14px 16px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .title-page {
+                padding: 30px 15px;
+            }
+            
+            .start-button {
+                padding: 16px 40px;
+                font-size: 1.1rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+            }
+            
+            .nav-button {
+                width: 100%;
+            }
+            
+            .product-image {
+                max-width: 180px;
+            }
+            
+            .price {
+                font-size: 1.6rem;
+            }
+            
+            table {
+                min-width: 450px;
+            }
+            
+            th, td {
+                padding: 12px 14px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Титульный лист -->
+        <div id="title-page" class="title-page">
+            <h1>PriceCompare</h1>
+            <h2>Платформа для оптимизации покупок с российских маркетплейсов</h2>
+            <p class="subtitle">
+                Современное решение для сравнения цен, анализа предложений и выбора 
+                оптимальных условий покупки на ведущих российских маркетплейсах
+            </p>
+            
+            <div class="title-features">
+                <div class="feature-card">
+                    <h3>
+                        <span class="feature-icon">💰</span>
+                        Сравнение цен
+                    </h3>
+                    <p>Анализируем цены на одинаковые товары на разных маркетплейсах</p>
+                </div>
+                <div class="feature-card">
+                    <h3>
+                        <span class="feature-icon">⚡</span>
+                        Экономия времени
+                    </h3>
+                    <p>Все предложения в одном месте - больше не нужно переключаться между сайтами</p>
+                </div>
+                <div class="feature-card">
+                    <h3>
+                        <span class="feature-icon">📊</span>
+                        Умная аналитика
+                    </h3>
+                    <p>Подробная информация о доставке, гарантии и рейтингах продавцов</p>
+                </div>
+            </div>
+            
+            <div class="title-features" style="margin-top: 25px; max-width: 600px;">
+                <div class="feature-card" style="grid-column: 1 / -1;">
+                    <h3>
+                        <span class="feature-icon">🎯</span>
+                        Лучший выбор
+                    </h3>
+                    <p>Помогаем найти оптимальное сочетание цены, качества и условий</p>
+                </div>
+            </div>
+            
+            <button class="start-button" onclick="showMainContent()">Начать сравнение</button>
+        </div>
+        
+        <!-- Основной контент -->
+        <div id="main-content" class="main-content">
+            <header>
+                <h1>Сравнение iPhone 16 на маркетплейсах</h1>
+            </header>
+            
+            <div class="navigation">
+                <button class="nav-button active" onclick="showPage('main')">Сравнение</button>
+                <button class="nav-button" onclick="showPage('wildberries')">Wildberries</button>
+                <button class="nav-button" onclick="showPage('ozon')">Ozon</button>
+                <button class="nav-button" onclick="showPage('yandex')">Яндекс.Маркет</button>
+            </div>
+            
+            <!-- Главная страница сравнения -->
+            <div id="main-page" class="page active">
+                <div class="comparison-grid">
+                    <!-- Wildberries -->
+                    <div class="product-card">
+                        <img src="https://c.dns-shop.ru/thumb/st1/fit/0/0/eb647412446652d83d7d017ec8619954/0dfebbfdb98e7d9d5a716fcc2ae849859267a29a5fca9078bb42c9ad5d6ee9fe.jpg.webp" alt="Apple iPhone 16" class="product-image">
+                        <h3 class="product-name">Apple iPhone 16</h3>
+                        <p class="product-specs">8/512 ГБ, ультрамариновый, nano-SIM+eSIM</p>
+                        <div class="price-container">
+                            <span class="price">94 213 ₽</span>
+                        </div>
+                        <a href="https://www.wildberries.ru/catalog/459915385/detail.aspx?targetUrl=SN" class="buy-button" target="_blank">Купить на Wildberries</a>
+                        <p class="availability">В наличии 15 шт.</p>
+                        <p class="rating">⭐ 4.8 (467 отзывов)</p>
+                    </div>
+                    
+                    <!-- Ozon -->
+                    <div class="product-card">
+                        <img src="https://c.dns-shop.ru/thumb/st1/fit/500/500/6908dbc5933c57d838f947b330178dbc/14ce8c6a5fbaef30feb3cb6b7d742546c045c44eb9207be4acec68cade72a7cf.jpg.webp" alt="Apple iPhone 16" class="product-image">
+                        <h3 class="product-name">Apple iPhone 16</h3>
+                        <p class="product-specs">8/512 ГБ, черный, eSIM+SIM</p>
+                        <div class="price-container">
+                            <span class="price">112 553 ₽</span>
+                        </div>
+                        <a href="https://ozon.ru/t/h1mIWVN" class="buy-button" target="_blank">Купить на Ozon</a>
+                        <p class="availability">В наличии 12 шт.</p>
+                        <p class="rating">⭐ 4.8 (542 отзыва)</p>
+                    </div>
+                    
+                    <!-- Яндекс.Маркет -->
+                    <div class="product-card">
+                        <img src="https://c.dns-shop.ru/thumb/st1/fit/500/500/c6238fa3f84df972c4f61562a1c7c80d/a6c1bd275ec0bb03792b77ae91a4e77dc8b6c4b032cd61394337ccd028f98091.jpg.webp" alt="Apple iPhone 16" class="product-image">
+                        <h3 class="product-name">Apple iPhone 16</h3>
+                        <p class="product-specs">8/512 ГБ, белый, Dual nano SIM + eSIM</p>
+                        <div class="price-container">
+                            <span class="price">101 285 ₽</span>
+                        </div>
+                        <a href="https://market.yandex.ru/cc/85CVrw" class="buy-button" target="_blank">Купить на Яндекс.Маркет</a>
+                        <p class="availability">В наличии 10 шт.</p>
+                        <p class="rating">⭐ 4.9 (455 отзывов)</p>
+                    </div>
+                </div>
+                
+                <div class="specs-section">
+                    <h2>Основные характеристики</h2>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>Маркетплейс</th>
+                                <th>Wildberries</th>
+                                <th>Ozon</th>
+                                <th>Яндекс.Маркет</th>
+                            </tr>
+                            <tr>
+                                <td>Модель</td>
+                                <td>iPhone 16</td>
+                                <td>iPhone 16</td>
+                                <td>iPhone 16</td>
+                            </tr>
+                            <tr>
+                                <td>Память</td>
+                                <td>8/512 ГБ</td>
+                                <td>8/512 ГБ</td>
+                                <td>8/512 ГБ</td>
+                            </tr>
+                            <tr>
+                                <td>Цвет</td>
+                                <td>Ультрамариновый</td>
+                                <td>Черный</td>
+                                <td>Белый</td>
+                            </tr>
+                            <tr>
+                                <td>SIM-карты</td>
+                                <td>nano-SIM + eSIM</td>
+                                <td>eSIM + SIM</td>
+                                <td>Dual nano SIM + eSIM</td>
+                            </tr>
+                            <tr>
+                                <td>Цена</td>
+                                <td>94 213 ₽</td>
+                                <td>112 553 ₽</td>
+                                <td>101 285 ₽</td>
+                            </tr>
+                            <tr>
+                                <td>Доставка</td>
+                                <td>Бесплатно от 1500 ₽</td>
+                                <td>Бесплатно от 2500 ₽</td>
+                                <td>Бесплатно от 2999 ₽</td>
+                            </tr>
+                            <tr>
+                                <td>Гарантия</td>
+                                <td>12 месяцев</td>
+                                <td>18 месяцев</td>
+                                <td>12 месяцев</td>
+                            </tr>
+                            <tr>
+                                <td>Рейтинг магазина</td>
+                                <td>4.8 ★ (467 отзывов)</td>
+                                <td>4.8 ★ (542 отзыва)</td>
+                                <td>4.9 ★ (455 отзывов)</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="processor-section">
+                    <h2>Процессор</h2>
+                    <p class="processor-info">Apple A18 Bionic с 6-ядерным CPU, 5-ядерным GPU и 16-ядерным Neural Engine</p>
+                </div>
+            </div>
+            
+            <!-- Страница Wildberries -->
+            <div id="wildberries-page" class="page">
+                <div class="product-details">
+                    <div class="product-card">
+                        <img src="https://c.dns-shop.ru/thumb/st1/fit/0/0/eb647412446652d83d7d017ec8619954/0dfebbfdb98e7d9d5a716fcc2ae849859267a29a5fca9078bb42c9ad5d6ee9fe.jpg.webp" alt="Apple iPhone 16" class="product-image">
+                        <h3 class="product-name">Apple iPhone 16</h3>
+                        <p class="product-specs">8/512 ГБ, ультрамариновый, nano-SIM+eSIM</p>
+                        <div class="price-container">
+                            <span class="price">94 213 ₽</span>
+                        </div>
+                        <a href="https://www.wildberries.ru/catalog/459915385/detail.aspx?targetUrl=SN" class="buy-button" target="_blank">Купить на Wildberries</a>
+                        <p class="availability">В наличии 15 шт.</p>
+                        <p class="rating">Рейтинг магазина: 4.8 (467 отзывов)</p>
+                        
+                        <div class="delivery-info">
+                            <h4>Доставка Wildberries</h4>
+                            <p>• Бесплатная доставка до пункта выдачи</p>
+                            <p>• Курьерская доставка: 290 ₽</p>
+                            <p>• Самовывоз: доступен сегодня</p>
+                        </div>
+                    </div>
+                    
+                    <div class="specs-section">
+                        <h2>Характеристики iPhone 16</h2>
+                        <div class="table-container">
+                            <table>
+                                <tr>
+                                    <th>Модель</th>
+                                    <td>iPhone 16</td>
+                                </tr>
+                                <tr>
+                                    <th>Память</th>
+                                    <td>8/512 ГБ</td>
+                                </tr>
+                                <tr>
+                                    <th>Цвет</th>
+                                    <td>Ультрамариновый</td>
+                                </tr>
+                                <tr>
+                                    <th>SIM-карты</th>
+                                    <td>nano-SIM + eSIM</td>
+                                </tr>
+                                <tr>
+                                    <th>Экран</th>
+                                    <td>6.1" Super Retina XDR, 60 Гц</td>
+                                </tr>
+                                <tr>
+                                    <th>Процессор</th>
+                                    <td>Apple A18 Bionic</td>
+                                </tr>
+                                <tr>
+                                    <th>Камера</th>
+                                    <td>Двойная камера 48 МП + 12 МП</td>
+                                </tr>
+                                <tr>
+                                    <th>Гарантия</th>
+                                    <td>12 месяцев</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Страница Ozon -->
+            <div id="ozon-page" class="page">
+                <div class="product-details">
+                    <div class="product-card">
+                        <img src="https://c.dns-shop.ru/thumb/st1/fit/500/500/6908dbc5933c57d838f947b330178dbc/14ce8c6a5fbaef30feb3cb6b7d742546c045c44eb9207be4acec68cade72a7cf.jpg.webp" alt="Apple iPhone 16" class="product-image">
+                        <h3 class="product-name">Apple iPhone 16</h3>
+                        <p class="product-specs">8/512 ГБ, черный, eSIM+SIM</p>
+                        <div class="price-container">
+                            <span class="price">112 553 ₽</span>
+                        </div>
+                        <a href="https://ozon.ru/t/h1mIWVN" class="buy-button" target="_blank">Купить на Ozon</a>
+                        <p class="availability">В наличии 12 шт.</p>
+                        <p class="rating">Рейтинг магазина: 4.8 (542 отзыва)</p>
+                        
+                        <div class="delivery-info">
+                            <h4>Доставка Ozon</h4>
+                            <p>• Бесплатная доставка от 2500 ₽</p>
+                            <p>• Курьерская доставка: 199 ₽</p>
+                            <p>• Самовывоз: доступен сегодня</p>
+                        </div>
+                    </div>
+                    
+                    <div class="specs-section">
+                        <h2>Характеристики iPhone 16</h2>
+                        <div class="table-container">
+                            <table>
+                                <tr>
+                                    <th>Модель</th>
+                                    <td>iPhone 16</td>
+                                </tr>
+                                <tr>
+                                    <th>Память</th>
+                                    <td>8/512 ГБ</td>
+                                </tr>
+                                <tr>
+                                    <th>Цвет</th>
+                                    <td>Черный</td>
+                                </tr>
+                                <tr>
+                                    <th>SIM-карты</th>
+                                    <td>eSIM + SIM</td>
+                                </tr>
+                                <tr>
+                                    <th>Экран</th>
+                                    <td>6.1" Super Retina XDR, 60 Гц</td>
+                                </tr>
+                                <tr>
+                                    <th>Процессор</th>
+                                    <td>Apple A18 Bionic</td>
+                                </tr>
+                                <tr>
+                                    <th>Камера</th>
+                                    <td>Двойная камера 48 МП + 12 МП</td>
+                                </tr>
+                                <tr>
+                                    <th>Гарантия</th>
+                                    <td>18 месяцев</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Страница Яндекс.Маркет -->
+            <div id="yandex-page" class="page">
+                <div class="product-details">
+                    <div class="product-card">
+                        <img src="https://c.dns-shop.ru/thumb/st1/fit/500/500/c6238fa3f84df972c4f61562a1c7c80d/a6c1bd275ec0bb03792b77ae91a4e77dc8b6c4b032cd61394337ccd028f98091.jpg.webp" alt="Apple iPhone 16" class="product-image">
+                        <h3 class="product-name">Apple iPhone 16</h3>
+                        <p class="product-specs">8/512 ГБ, белый, Dual nano SIM + eSIM</p>
+                        <div class="price-container">
+                            <span class="price">101 285 ₽</span>
+                        </div>
+                        <a href="https://market.yandex.ru/cc/85CVrw" class="buy-button" target="_blank">Купить на Яндекс.Маркет</a>
+                        <p class="availability">В наличии 10 шт.</p>
+                        <p class="rating">Рейтинг магазина: 4.9 (455 отзывов)</p>
+                        
+                        <div class="delivery-info">
+                            <h4>Доставка Яндекс.Маркет</h4>
+                            <p>• Бесплатная доставка от 2999 ₽</p>
+                            <p>• Курьерская доставка: 249 ₽</p>
+                            <p>• Самовывоз: доступен сегодня</p>
+                        </div>
+                    </div>
+                    
+                    <div class="specs-section">
+                        <h2>Характеристики iPhone 16</h2>
+                        <div class="table-container">
+                            <table>
+                                <tr>
+                                    <th>Модель</th>
+                                    <td>iPhone 16</td>
+                                </tr>
+                                <tr>
+                                    <th>Память</th>
+                                    <td>8/512 ГБ</td>
+                                </tr>
+                                <tr>
+                                    <th>Цвет</th>
+                                    <td>Белый</td>
+                                </tr>
+                                <tr>
+                                    <th>SIM-карты</th>
+                                    <td>Dual nano SIM + eSIM</td>
+                                </tr>
+                                <tr>
+                                    <th>Экран</th>
+                                    <td>6.1" Super Retina XDR, 60 Гц</td>
+                                </tr>
+                                <tr>
+                                    <th>Процессор</th>
+                                    <td>Apple A18 Bionic</td>
+                                </tr>
+                                <tr>
+                                    <th>Камера</th>
+                                    <td>Двойная камера 48 МП + 12 МП</td>
+                                </tr>
+                                <tr>
+                                    <th>Гарантия</th>
+                                    <td>12 месяцев</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMainContent() {
+            document.getElementById('title-page').style.display = 'none';
+            document.getElementById('main-content').classList.add('active');
+        }
+        
+        function showPage(pageId) {
+            // Скрыть все страницы
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Убрать активный класс со всех кнопок
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Показать выбранную страницу
+            document.getElementById(pageId + '-page').classList.add('active');
+            
+            // Сделать активной выбранную кнопку
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
